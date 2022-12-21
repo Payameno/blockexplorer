@@ -1,5 +1,6 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
+import timeConverter from './helpers/timeConverter'
 import './App.css';
 
 // Refer to the README doc for more information about using API
@@ -19,6 +20,7 @@ const settings = {
 const alchemy = new Alchemy(settings);
 
 function App() {
+  const [block, setBlock] = useState();
   const [blockNumber, setBlockNumber] = useState();
 
   useEffect(() => {
@@ -29,11 +31,23 @@ function App() {
     getBlockNumber();
   });
 
-  alchemy.core.getBlock(blockNumber).then(console.log);
+  useEffect(() => {
+    console.log("blockNumber", blockNumber);
+    async function getBlock() {
+      setBlock(await alchemy.core.getBlock(blockNumber));
+    }
+    getBlock()
+  }, [blockNumber]);
 
   return (
-  <div className="App">Block Number: {blockNumber}</div>
+  <>
+    <div className="App">Block Height: {blockNumber}</div>
+    <div className="App">Status:</div>
+    {block && <div className="App">Timestamp: {timeConverter(block.timestamp)}</div>}
+    <div className="App">Proposed On:</div>
+    <div className="App">Transactions:</div>
 
+  </>
   );
 }
 
